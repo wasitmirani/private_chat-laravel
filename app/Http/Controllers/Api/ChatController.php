@@ -27,7 +27,7 @@ class ChatController extends Controller
             [
             'sender_id'=>  $request->auth_user,
             'receiver_id'=> $request->receiver_id,
-            'message'=>$request->message,
+            'message'=>$request->message_body,
 
             ]
             );

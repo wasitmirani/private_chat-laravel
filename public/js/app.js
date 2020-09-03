@@ -4155,6 +4155,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     send_message: function send_message() {
+      var _this = this;
+
       socket.emit("private-message", {
         message: this.message_body,
         sender_id: this.auth_user_id,
@@ -4164,24 +4166,37 @@ __webpack_require__.r(__webpack_exports__);
         message: this.message_body,
         sender_id: this.auth_user_id,
         receiver_id: this.activeFriend.user_id
-      });
+      }); // setTimeout(window.scrollToEnd,100);
+
+      setTimeout(function () {
+        $("#messagebox").css("bottom", "10");
+      }, 100);
       var frmdata = new FormData();
       frmdata.append("message_body", this.message_body);
       frmdata.append('sender_id', this.auth_user_id);
       frmdata.append('receiver_id', this.activeFriend.user_id);
-      axios.post('/api/send/message/' + this.auth_user_id + '/' + this.activeFriend.user_id, frmdata).then(function (res) {});
+      axios.post('/api/send/message/' + this.auth_user_id + '/' + this.activeFriend.user_id, frmdata).then(function (res) {
+        _this.message_body = "";
+      });
     },
     fetchMessages: function fetchMessages(activeFriend) {
-      var _this = this;
+      var _this2 = this;
 
       if (!activeFriend) {
         return alert('Please select friend');
-      }
+      } // var id=document.getElementById('messagebox');
+
+
+      var el = document.getElementById('messagebox');
+      el.scrollTop = el.innerHeight; //            $('html, body').animate({
+      //     scrollTop: $("#messagebox").offset().top
+      // }, 2000);
+      // $(".simplebar-vertical").css("transform", "translate3d(200px, 200px, 200px)");
 
       axios.get('/api/private-messages/' + this.auth_user_id + '/' + activeFriend.user_id).then(function (response) {
-        _this.allMessages = response.data;
+        _this2.allMessages = response.data;
         console.log();
-        setTimeout(_this.scrollToEnd, 100);
+        setTimeout(_this2.scrollToEnd, 100);
       });
     },
     get_current_user: function get_current_user(user) {
@@ -4191,24 +4206,30 @@ __webpack_require__.r(__webpack_exports__);
       this.activeFriend = user;
     },
     online_users: function online_users() {
-      var online_users = JSON.parse(this.onlineusers);
+      var _this3 = this;
 
-      for (var i = 0; i < online_users.length; i++) {
-        this.users.push(online_users[i]);
-      }
+      axios.get('/active/users').then(function (res) {
+        _this3.users = res.data;
+      }); //        let active_users=JSON.parse(this.onlineusers);
+      // for (var i = 0; i < active_users.length; i++) {
+      //         this.users.push(active_users[i]);
+      // }
+      // console.log(active_users);
     }
   },
   mounted: function mounted() {
-    var _this2 = this;
+    var _this4 = this;
 
+    // this.online_users();
     var retrievedObject = localStorage.getItem('Auth_user');
     this.activeUser = JSON.parse(retrievedObject);
-    this.auth_user_id = this.activeUser.user_id;
-    socket.emit('activeusers', this.activeUser);
+    this.auth_user_id = this.activeUser.user_id; // this.online_users();
+
+    socket.emit('activeuser', this.activeUser);
     console.warn("connteced", Object.keys(socket.connected).length, this.activeUser);
 
     window.onbeforeunload = function () {
-      socket.emit('leaved', _this2.activeUser);
+      socket.emit('leaved', _this4.activeUser);
     }; //  io.emit('noOfConnections', ())
     //  socket.on('noOfConnections', (count) => {
     //                 this.connectionCount = count
@@ -4226,7 +4247,7 @@ __webpack_require__.r(__webpack_exports__);
 
   },
   created: function created() {
-    var _this3 = this;
+    var _this5 = this;
 
     this.online_users();
     console.log("online", this.users);
@@ -4236,42 +4257,43 @@ __webpack_require__.r(__webpack_exports__);
     socket.on('private-message', function (data) {
       console.log("new message", data);
 
-      if (data.sender_id == _this3.activeFriend.user_id && data.receiver_id == _this3.auth_user_id) {
-        _this3.allMessages.push({
+      if (data.sender_id == _this5.activeFriend.user_id && data.receiver_id == _this5.auth_user_id) {
+        _this5.allMessages.push({
           message: data.message,
           sender_id: data.sender_id,
           receiver_id: data.receiver_id
         });
+
+        console.log(data.sender_id);
       }
     });
-    socket.on('activeusers', function (user) {
-      var ar2 = [];
-      ar2.push(user);
-
-      _this3.users.concat(ar2); // for (let index = 0; index < this.users.length; index++) {
-      //     const element = array[index];
-      // }
-      // for (var i = 0; i < this.users.length; i++) {
-      //     var item = this.users[i];
-      //     console.log(user[item.id]);
-      //     if (!user[item.id]) {
-      //         user[item.id] = item;
-      //         this.users.push(item);
-      //     }
-      //     }
-
-
-      console.warn("joined list", _this3.users); // this.info.push({ name: name, type: 'Joined' })
-
-      setInterval(function () {// this.info = []
+    socket.on('leaved', function (user) {
+      // this.users.splice(this.user.indexOf(user))
+      // this.info.push({ name: name, type: 'Leaved' })
+      setTimeout(function () {// this.info = []
       }, 5000);
     });
+    socket.on('activeuser', function (user) {
+      // const arr_lngth=this.users.length+1
+      for (var index = 0; index < _this5.users.length + 1; index++) {
+        if (index == _this5.users.length + 1) {
+          if (_this5.users[index].id != user.id) _this5.users.push(user);
+        } // if(this.users[index].id!=user.id){
+        //     console.log("tru");
+        //          const element= this.users[index];
+        // }
 
-    window.onunload = function () {
-      socket.on('leaved', function (user) {
-        console.log("leaved user", user);
-      });
-    };
+
+        console.log("Joined", _this5.users);
+      } // if( users.filter(checkUser)){
+      //     this.users.push(user)
+      // }
+      // this.info.push({ name: name, type: 'Joined' })
+
+
+      setTimeout(function () {// this.info = []
+      }, 5000);
+    });
   }
 });
 
@@ -32475,7 +32497,7 @@ var render = function() {
               "div",
               {
                 staticClass: "chat-conversation p-3 p-lg-4",
-                attrs: { "data-simplebar": "init" }
+                attrs: { "data-simplebar": "init", id: "messagebox" }
               },
               [
                 _c(
@@ -32490,81 +32512,94 @@ var render = function() {
                             _vm.auth_user_id == message.sender_id ? "" : "right"
                         },
                         [
-                          _c("div", { staticClass: "conversation-list" }, [
-                            _c("div", { staticClass: "chat-avatar" }, [
-                              _vm.auth_user_id === message.sender_id
-                                ? _c(
-                                    "span",
-                                    [
-                                      _c("vue-letter-avatar", {
-                                        staticClass: "rounded-circle avatar-xs",
-                                        attrs: {
-                                          name: _vm.activeUser.name,
-                                          size: "40",
-                                          rounded: true
-                                        }
-                                      })
-                                    ],
-                                    1
-                                  )
-                                : _c(
-                                    "span",
-                                    [
-                                      _c("vue-letter-avatar", {
-                                        staticClass: "rounded-circle avatar-xs",
-                                        attrs: {
-                                          name: _vm.activeFriend.name,
-                                          size: "40",
-                                          rounded: true
-                                        }
-                                      })
-                                    ],
-                                    1
-                                  ),
-                              _vm._v(" "),
-                              _c("span")
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "user-chat-content" }, [
-                              _c("div", { staticClass: "ctext-wrap" }, [
-                                _c(
-                                  "div",
-                                  { staticClass: "ctext-wrap-content" },
-                                  [
-                                    _c("p", { staticClass: "mb-0" }, [
-                                      _vm._v(
-                                        "\n                                                        " +
-                                          _vm._s(message.message) +
-                                          "\n                                                    "
-                                      )
-                                    ]),
-                                    _vm._v(" "),
-                                    _vm._m(10, true)
-                                  ]
-                                ),
+                          _c(
+                            "div",
+                            {
+                              staticClass: "conversation-list",
+                              attrs: { id: "" }
+                            },
+                            [
+                              _c("div", { staticClass: "chat-avatar" }, [
+                                _vm.auth_user_id === message.sender_id
+                                  ? _c(
+                                      "span",
+                                      [
+                                        _c("vue-letter-avatar", {
+                                          staticClass:
+                                            "rounded-circle avatar-xs",
+                                          attrs: {
+                                            name: _vm.activeUser.name,
+                                            size: "40",
+                                            rounded: true
+                                          }
+                                        })
+                                      ],
+                                      1
+                                    )
+                                  : _c(
+                                      "span",
+                                      [
+                                        _c("vue-letter-avatar", {
+                                          staticClass:
+                                            "rounded-circle avatar-xs",
+                                          attrs: {
+                                            name: _vm.activeFriend.name,
+                                            size: "40",
+                                            rounded: true
+                                          }
+                                        })
+                                      ],
+                                      1
+                                    ),
                                 _vm._v(" "),
-                                _vm._m(11, true)
+                                _c("span")
                               ]),
                               _vm._v(" "),
-                              _c("div", { staticClass: "conversation-name" }, [
-                                _vm.auth_user_id == message.sender_id
-                                  ? _c("span", [
-                                      _vm._v(
-                                        "\n\n                                                    " +
-                                          _vm._s(_vm.activeUser.name) +
-                                          "\n                                                "
-                                      )
-                                    ])
-                                  : _c("span", [
-                                      _vm._v(
-                                        "\n                                                    " +
-                                          _vm._s(_vm.activeFriend.name) +
-                                          "\n                                                "
-                                      )
-                                    ])
+                              _c("div", { staticClass: "user-chat-content" }, [
+                                _c("div", { staticClass: "ctext-wrap" }, [
+                                  _c(
+                                    "div",
+                                    { staticClass: "ctext-wrap-content" },
+                                    [
+                                      _c("p", { staticClass: "mb-0" }, [
+                                        _vm._v(
+                                          "\n                                                        " +
+                                            _vm._s(message.message) +
+                                            "\n                                                    "
+                                        )
+                                      ]),
+                                      _vm._v(" "),
+                                      _vm._m(10, true)
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _vm._m(11, true)
+                                ]),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "conversation-name" },
+                                  [
+                                    _vm.auth_user_id == message.sender_id
+                                      ? _c("span", [
+                                          _vm._v(
+                                            "\n\n                                                    " +
+                                              _vm._s(_vm.activeUser.name) +
+                                              "\n                                                "
+                                          )
+                                        ])
+                                      : _c("span", [
+                                          _vm._v(
+                                            "\n                                                    " +
+                                              _vm._s(_vm.activeFriend.name) +
+                                              "\n                                                "
+                                          )
+                                        ])
+                                  ]
+                                )
                               ])
-                            ])
-                          ])
+                            ]
+                          )
                         ]
                       )
                     ])
@@ -51088,15 +51123,14 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /*!******************************************!*\
   !*** ./resources/js/components/Chat.vue ***!
   \******************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Chat_vue_vue_type_template_id_0d66c37a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Chat.vue?vue&type=template&id=0d66c37a& */ "./resources/js/components/Chat.vue?vue&type=template&id=0d66c37a&");
 /* harmony import */ var _Chat_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Chat.vue?vue&type=script&lang=js& */ "./resources/js/components/Chat.vue?vue&type=script&lang=js&");
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Chat_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Chat_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -51126,7 +51160,7 @@ component.options.__file = "resources/js/components/Chat.vue"
 /*!*******************************************************************!*\
   !*** ./resources/js/components/Chat.vue?vue&type=script&lang=js& ***!
   \*******************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -51241,8 +51275,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\laragon\www\private_chat-laravel\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\laragon\www\private_chat-laravel\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\laragon\www\realtime_chat_laravel\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\realtime_chat_laravel\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ }),

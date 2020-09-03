@@ -24,3 +24,6 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/test/event',function(){
     event(new GetData("Hello this is realtime send data"));
 });
+
+
+Route::get('/active/users','HomeController@userOnlineStatus');

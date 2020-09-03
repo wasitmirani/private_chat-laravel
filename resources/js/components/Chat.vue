@@ -1732,11 +1732,11 @@
                         <!-- end chat user head -->
 
                         <!-- start chat conversation -->
-                        <div class="chat-conversation p-3 p-lg-4" data-simplebar="init">
-                            <ul class="list-unstyled mb-0">
+                        <div class="chat-conversation p-3 p-lg-4" data-simplebar="init" id="messagebox">
+                            <ul class="list-unstyled mb-0" >
                                 <div v-for="message in allMessages" :key="message.id">
    <li :class="(auth_user_id==message.sender_id)?'':'right'" >
-                                    <div class="conversation-list" >
+                                    <div class="conversation-list" id>
                                         <div class="chat-avatar">
                                                <span v-if="auth_user_id===message.sender_id">
                                                     <vue-letter-avatar :name="activeUser.name" size='40' :rounded=true class="rounded-circle avatar-xs" />
@@ -2185,20 +2185,32 @@
         sender_id: this.auth_user_id,
         receiver_id: this.activeFriend.user_id
       });
+     // setTimeout(window.scrollToEnd,100);
 
-
+    setTimeout(() => {
+    $("#messagebox").css("bottom", "10");
+    }, 100);
     let frmdata= new FormData();
     frmdata.append("message_body",this.message_body);
     frmdata.append('sender_id',this.auth_user_id);
     frmdata.append('receiver_id',this.activeFriend.user_id);
-      axios.post('/api/send/message/'+this.auth_user_id+'/'+this.activeFriend.user_id,frmdata).then((res)=>{
 
+      axios.post('/api/send/message/'+this.auth_user_id+'/'+this.activeFriend.user_id,frmdata).then((res)=>{
+          this.message_body="";
       });
                 },
               fetchMessages(activeFriend) {
                 if(!activeFriend){
                 return alert('Please select friend');
                 }
+                // var id=document.getElementById('messagebox');
+                let el = document.getElementById('messagebox');
+el.scrollTop = el.innerHeight;
+    //            $('html, body').animate({
+    //     scrollTop: $("#messagebox").offset().top
+    // }, 2000);
+                // $(".simplebar-vertical").css("transform", "translate3d(200px, 200px, 200px)");
+
             axios.get('/api/private-messages/'+this.auth_user_id+'/'+activeFriend.user_id).then(response => {
                 this.allMessages = response.data;
                 console.log()
@@ -2214,21 +2226,29 @@
                 this.activeFriend=user;
             },
              online_users(){
-                   let online_users=JSON.parse(this.onlineusers);
 
-            for (var i = 0; i < online_users.length; i++) {
-                    this.users.push(online_users[i]);
-            }
+                 axios.get('/active/users').then((res)=>{
+                     this.users=res.data;
+                 });
+            //        let active_users=JSON.parse(this.onlineusers);
+
+            // for (var i = 0; i < active_users.length; i++) {
+            //         this.users.push(active_users[i]);
+            // }
+            // console.log(active_users);
 
         },
         },
         mounted() {
 
+            // this.online_users();
 
             var retrievedObject = localStorage.getItem('Auth_user');
             this.activeUser=JSON.parse(retrievedObject);
             this.auth_user_id=this.activeUser.user_id;
-         socket.emit('activeusers',  this.activeUser)
+            // this.online_users();
+               socket.emit('activeuser',  this.activeUser);
+
          console.warn("connteced",Object.keys(socket.connected).length,this.activeUser);
          window.onbeforeunload = () => {
 
@@ -2271,48 +2291,48 @@
                             sender_id: data.sender_id,
                             receiver_id: data.receiver_id
                         });
+
+                        console.log(data.sender_id);
                 }
 
             });
-            socket.on('activeusers', (user) => {
 
-
-
-                var ar2 = [];
-                ar2.push(user);
-
-         this.users.concat(ar2);
-
-
-
-                // for (let index = 0; index < this.users.length; index++) {
-                //     const element = array[index];
-
-                // }
-                // for (var i = 0; i < this.users.length; i++) {
-                //     var item = this.users[i];
-                //     console.log(user[item.id]);
-                //     if (!user[item.id]) {
-                //         user[item.id] = item;
-                //         this.users.push(item);
-                //     }
-                //     }
-
-                    console.warn("joined list", this.users);
-                    // this.info.push({ name: name, type: 'Joined' })
-                    setInterval(() => {
+     socket.on('leaved', (user) => {
+                    // this.users.splice(this.user.indexOf(user))
+                    // this.info.push({ name: name, type: 'Leaved' })
+                    setTimeout(() => {
                         // this.info = []
                     }, 5000);
                 })
 
-                window.onunload=()=>{
-                     socket.on('leaved', (user) => {
-                    console.log("leaved user",user);
+                socket.on('activeuser', (user) => {
 
 
+                    // const arr_lngth=this.users.length+1
+                    for (let index = 0; index < this.users.length+1; index++) {
 
+                        if( index==  this.users.length+1){
+                            if(this.users[index].id!=user.id)
+                                this.users.push(user);
+                        }
+
+                        // if(this.users[index].id!=user.id){
+                        //     console.log("tru");
+                        //          const element= this.users[index];
+                        // }
+
+                    console.log("Joined",this.users);
+                    }
+                    // if( users.filter(checkUser)){
+                    //     this.users.push(user)
+                    // }
+
+                    // this.info.push({ name: name, type: 'Joined' })
+                    setTimeout(() => {
+                        // this.info = []
+                    }, 5000);
                 })
-                }
+
 
         }
     }

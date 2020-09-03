@@ -43,11 +43,11 @@ class HomeController extends Controller
         foreach ($users as $user) {
             if (Cache::has('user-is-online-' . $user->id))
             $active_users[]=$user;
-            else
-                echo "User " . $user->name . " is offline.";
+            // else
+            //     echo "User " . $user->name . " is offline.";
 
 
         }
-        return  dd( $active_users);
+        return  response()->json($active_users);
     }
 }
