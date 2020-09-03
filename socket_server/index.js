@@ -16,7 +16,8 @@ io.on('connection', (socket,user) => {
     userCount++;
     // io.emit('noOfConnections', Object.keys(io.sockets.connected).length)
     io.emit('userCount', { userCount: userCount ,newUser:user});
-    
+
+
     socket.on('disconnect', () => {
         console.log('disconnected')
         // io.emit('noOfConnections', Object.keys(io.sockets.connected).length)
@@ -31,7 +32,7 @@ io.on('connection', (socket,user) => {
         // io.sockets.in(user.email).emit('new_msg', {msg: 'hello'});
         console.log(msg);
         socket.broadcast.emit('chat-message', msg)
-           
+
     })
     socket.on('users',(users)=>{
         socket.broadcast.emit('users');
@@ -43,8 +44,8 @@ io.on('connection', (socket,user) => {
     })
     socket.on('activeusers',(users)=>{
         socket.broadcast.emit('activeusers', users)
-       
-       
+
+
         console.log(users);
     });
 

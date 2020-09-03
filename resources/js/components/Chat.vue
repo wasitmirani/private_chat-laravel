@@ -2185,6 +2185,14 @@
                 this.fetchMessages(user);
                 this.activeFriend=user;
             },
+             online_users(){
+                   let online_users=JSON.parse(this.onlineusers);
+
+            for (var i = 0; i < online_users.length; i++) {
+                    this.users.push(online_users[i]);
+            }
+
+        },
         },
         mounted() {
 
@@ -2215,16 +2223,16 @@
             // });
 
 
+
         },
 
         created(){
-            let online_users=JSON.parse(this.onlineusers);
-
-            for (var i = 0; i < online_users.length; i++) {
-                    this.users.push(online_users[i]);
-            }
-
+                    this.online_users();
                    console.log("online", this.users);
+
+                   socket.on('add-message-response',(data)=>{
+                       consolg.log(data);
+                   });
             socket.on('activeusers', (user) => {
 
 
@@ -2261,7 +2269,7 @@
                     console.log("leaved user",user);
 
 
-                    
+
                 })
                 }
 

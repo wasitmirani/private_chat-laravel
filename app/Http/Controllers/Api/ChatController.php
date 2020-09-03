@@ -18,6 +18,7 @@ class ChatController extends Controller
         })
         ->get();
 
-        return $privateCommunication;
+
+        return response()->json($privateCommunication);
     }
 }
