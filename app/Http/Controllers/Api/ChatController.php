@@ -21,4 +21,15 @@ class ChatController extends Controller
 
         return response()->json($privateCommunication);
     }
+
+    public function send_message(Request $request){
+        Message::create(
+            [
+            'sender_id'=>  $request->auth_user,
+            'receiver_id'=> $request->receiver_id,
+            'message'=>$request->message,
+
+            ]
+            );
+    }
 }

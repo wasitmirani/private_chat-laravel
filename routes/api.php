@@ -22,4 +22,5 @@ Route::get('/private-messages/{auth_user}/{receiver_id}','Api\ChatController@get
 // Route::get('/get/messages',)
 
 
+Route::post('/send/message/{auth_user}/{receiver_id}','Api\ChatController@send_message');
 Route::get('/active/users','HomeController@userOnlineStatus');

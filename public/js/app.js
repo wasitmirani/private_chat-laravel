@@ -4142,6 +4142,7 @@ __webpack_require__.r(__webpack_exports__);
       auth_user_id: '',
       users: [],
       message: null,
+      message_body: '',
       files: [],
       activeFriend: {},
       activeUser: {},
@@ -4153,6 +4154,23 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    send_message: function send_message() {
+      socket.emit("private-message", {
+        message: this.message_body,
+        sender_id: this.auth_user_id,
+        receiver_id: this.activeFriend.user_id
+      });
+      this.allMessages.push({
+        message: this.message_body,
+        sender_id: this.auth_user_id,
+        receiver_id: this.activeFriend.user_id
+      });
+      var frmdata = new FormData();
+      frmdata.append("message_body", this.message_body);
+      frmdata.append('sender_id', this.auth_user_id);
+      frmdata.append('receiver_id', this.activeFriend.user_id);
+      axios.post('/api/send/message/' + this.auth_user_id + '/' + this.activeFriend.user_id, frmdata).then(function (res) {});
+    },
     fetchMessages: function fetchMessages(activeFriend) {
       var _this = this;
 
@@ -4214,6 +4232,17 @@ __webpack_require__.r(__webpack_exports__);
     console.log("online", this.users);
     socket.on('add-message-response', function (data) {
       consolg.log(data);
+    });
+    socket.on('private-message', function (data) {
+      console.log("new message", data);
+
+      if (data.sender_id == _this3.activeFriend.user_id && data.receiver_id == _this3.auth_user_id) {
+        _this3.allMessages.push({
+          message: data.message,
+          sender_id: data.sender_id,
+          receiver_id: data.receiver_id
+        });
+      }
     });
     socket.on('activeusers', function (user) {
       var ar2 = [];
@@ -32545,7 +32574,53 @@ var render = function() {
               ]
             ),
             _vm._v(" "),
-            _vm._m(12)
+            _c("div", { staticClass: "p-3 p-lg-4 border-top mb-0" }, [
+              _c("div", { staticClass: "row no-gutters" }, [
+                _c("div", { staticClass: "col" }, [
+                  _c("div", [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.message_body,
+                          expression: "message_body"
+                        }
+                      ],
+                      staticClass:
+                        "form-control form-control-lg bg-light border-light",
+                      attrs: { type: "text", placeholder: "Enter Message..." },
+                      domProps: { value: _vm.message_body },
+                      on: {
+                        keyup: function($event) {
+                          if (
+                            !$event.type.indexOf("key") &&
+                            _vm._k(
+                              $event.keyCode,
+                              "enter",
+                              13,
+                              $event.key,
+                              "Enter"
+                            )
+                          ) {
+                            return null
+                          }
+                          return _vm.send_message($event)
+                        },
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.message_body = $event.target.value
+                        }
+                      }
+                    })
+                  ])
+                ]),
+                _vm._v(" "),
+                _vm._m(12)
+              ])
+            ])
           ]),
           _vm._v(" "),
           _vm._m(13)
@@ -37892,66 +37967,53 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "p-3 p-lg-4 border-top mb-0" }, [
-      _c("div", { staticClass: "row no-gutters" }, [
-        _c("div", { staticClass: "col" }, [
-          _c("div", [
-            _c("input", {
-              staticClass: "form-control form-control-lg bg-light border-light",
-              attrs: { type: "text", placeholder: "Enter Message..." }
-            })
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-auto" }, [
-          _c("div", { staticClass: "chat-input-links ml-md-2" }, [
-            _c("ul", { staticClass: "list-inline mb-0" }, [
-              _c("li", { staticClass: "list-inline-item" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass:
-                      "btn btn-link text-decoration-none font-size-16 btn-lg waves-effect",
-                    attrs: {
-                      type: "button",
-                      "data-toggle": "tooltip",
-                      "data-placement": "top",
-                      title: "Emoji"
-                    }
-                  },
-                  [_c("i", { staticClass: "ri-emotion-happy-line" })]
-                )
-              ]),
-              _vm._v(" "),
-              _c("li", { staticClass: "list-inline-item" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass:
-                      "btn btn-link text-decoration-none font-size-16 btn-lg waves-effect",
-                    attrs: {
-                      type: "button",
-                      "data-toggle": "tooltip",
-                      "data-placement": "top",
-                      title: "Attached File"
-                    }
-                  },
-                  [_c("i", { staticClass: "ri-attachment-line" })]
-                )
-              ]),
-              _vm._v(" "),
-              _c("li", { staticClass: "list-inline-item" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass:
-                      "btn btn-primary font-size-16 btn-lg chat-send waves-effect waves-light",
-                    attrs: { type: "submit" }
-                  },
-                  [_c("i", { staticClass: "ri-send-plane-2-fill" })]
-                )
-              ])
-            ])
+    return _c("div", { staticClass: "col-auto" }, [
+      _c("div", { staticClass: "chat-input-links ml-md-2" }, [
+        _c("ul", { staticClass: "list-inline mb-0" }, [
+          _c("li", { staticClass: "list-inline-item" }, [
+            _c(
+              "button",
+              {
+                staticClass:
+                  "btn btn-link text-decoration-none font-size-16 btn-lg waves-effect",
+                attrs: {
+                  type: "button",
+                  "data-toggle": "tooltip",
+                  "data-placement": "top",
+                  title: "Emoji"
+                }
+              },
+              [_c("i", { staticClass: "ri-emotion-happy-line" })]
+            )
+          ]),
+          _vm._v(" "),
+          _c("li", { staticClass: "list-inline-item" }, [
+            _c(
+              "button",
+              {
+                staticClass:
+                  "btn btn-link text-decoration-none font-size-16 btn-lg waves-effect",
+                attrs: {
+                  type: "button",
+                  "data-toggle": "tooltip",
+                  "data-placement": "top",
+                  title: "Attached File"
+                }
+              },
+              [_c("i", { staticClass: "ri-attachment-line" })]
+            )
+          ]),
+          _vm._v(" "),
+          _c("li", { staticClass: "list-inline-item" }, [
+            _c(
+              "button",
+              {
+                staticClass:
+                  "btn btn-primary font-size-16 btn-lg chat-send waves-effect waves-light",
+                attrs: { type: "submit" }
+              },
+              [_c("i", { staticClass: "ri-send-plane-2-fill" })]
+            )
           ])
         ])
       ])

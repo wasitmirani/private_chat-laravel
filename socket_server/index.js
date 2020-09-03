@@ -27,6 +27,11 @@ io.on('connection', (socket,user) => {
 
 
 
+
+    socket.on('private-message',(msg)=>{
+        console.warn("new message",msg);
+        socket.broadcast.emit('private-message', msg)
+    });
     socket.on('chat-message', (msg) => {
 
         // io.sockets.in(user.email).emit('new_msg', {msg: 'hello'});
@@ -46,7 +51,7 @@ io.on('connection', (socket,user) => {
         socket.broadcast.emit('activeusers', users)
 
 
-        console.log(users);
+        console.warn('active',users);
     });
 
     socket.on('typing', (data) => {

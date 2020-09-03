@@ -1870,7 +1870,7 @@
                             <div class="row no-gutters">
                                 <div class="col">
                                     <div>
-                                        <input type="text" class="form-control form-control-lg bg-light border-light" placeholder="Enter Message...">
+                                        <input type="text" v-model="message_body" class="form-control form-control-lg bg-light border-light" placeholder="Enter Message..."  v-on:keyup.enter="send_message">
                                     </div>
                                 </div>
                                 <div class="col-auto">
@@ -2154,6 +2154,7 @@
                 auth_user_id:'',
                 users:[],
                  message:null,
+                 message_body:'',
                 files:[],
                 activeFriend:{},
                 activeUser:{},
@@ -2167,6 +2168,33 @@
         },
         methods:{
 
+
+                send_message(){
+                      socket.emit(
+        "private-message",
+        {
+          message: this.message_body,
+          sender_id: this.auth_user_id,
+          receiver_id:this.activeFriend.user_id,
+        },
+
+      );
+
+      this.allMessages.push({
+        message: this.message_body,
+        sender_id: this.auth_user_id,
+        receiver_id: this.activeFriend.user_id
+      });
+
+
+    let frmdata= new FormData();
+    frmdata.append("message_body",this.message_body);
+    frmdata.append('sender_id',this.auth_user_id);
+    frmdata.append('receiver_id',this.activeFriend.user_id);
+      axios.post('/api/send/message/'+this.auth_user_id+'/'+this.activeFriend.user_id,frmdata).then((res)=>{
+
+      });
+                },
               fetchMessages(activeFriend) {
                 if(!activeFriend){
                 return alert('Please select friend');
@@ -2233,6 +2261,19 @@
                    socket.on('add-message-response',(data)=>{
                        consolg.log(data);
                    });
+
+            socket.on('private-message',(data)=>{
+                console.log("new message",data);
+                if(data.sender_id==this.activeFriend.user_id && data.receiver_id==this.auth_user_id)
+                {
+                       this.allMessages.push({
+                            message: data.message,
+                            sender_id: data.sender_id,
+                            receiver_id: data.receiver_id
+                        });
+                }
+
+            });
             socket.on('activeusers', (user) => {
 
 
