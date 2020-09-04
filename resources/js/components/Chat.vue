@@ -1732,8 +1732,8 @@
                         <!-- end chat user head -->
 
                         <!-- start chat conversation -->
-                        <div class="chat-conversation p-3 p-lg-4" data-simplebar="init" id="messagebox">
-                            <ul class="list-unstyled mb-0" >
+                        <div class="chat-conversation p-3 p-lg-4" data-simplebar="init" >
+                            <ul class="list-unstyled mb-0"  ref="messagesContainer" id="messagebox">
                                 <div v-for="message in allMessages" :key="message.id">
    <li :class="(auth_user_id==message.sender_id)?'':'right'" >
                                     <div class="conversation-list" id>
@@ -2168,7 +2168,15 @@
         },
         methods:{
 
+	scrollToEnd() {
 
+        window.scrollTo(0,document.querySelector(".chat-conversation").scrollHeight);
+				// var container = document.querySelector(".chat-conversation");
+				// var scrollHeight = container.scrollHeight;
+                // container.scrollDown = scrollHeight /scrollHeight;
+                // console.log( scrollHeight);
+                // console.log(container.scrollToEnd)
+			},
                 send_message(){
                       socket.emit(
         "private-message",
@@ -2204,17 +2212,16 @@
                 return alert('Please select friend');
                 }
                 // var id=document.getElementById('messagebox');
-                let el = document.getElementById('messagebox');
-el.scrollTop = el.innerHeight;
+$(".simplebar-content-wrapper").animate({ scrollTop: $('.simplebar-content-wrapper').prop("scrollHeight")}, 1000);
     //            $('html, body').animate({
-    //     scrollTop: $("#messagebox").offset().top
+    //     scrollTop: $("#messagebox").offseSt().top
     // }, 2000);
                 // $(".simplebar-vertical").css("transform", "translate3d(200px, 200px, 200px)");
 
             axios.get('/api/private-messages/'+this.auth_user_id+'/'+activeFriend.user_id).then(response => {
                 this.allMessages = response.data;
                 console.log()
-              setTimeout(this.scrollToEnd,100);
+            //   setTimeout(this.scrollToEnd,100);
 
             });
         },
@@ -2239,7 +2246,12 @@ el.scrollTop = el.innerHeight;
 
         },
         },
+        	updated() {
+			   	// this.scrollToEnd();
+
+		},
         mounted() {
+            	// this.scrollToEnd();
 
             // this.online_users();
 
@@ -2247,7 +2259,7 @@ el.scrollTop = el.innerHeight;
             this.activeUser=JSON.parse(retrievedObject);
             this.auth_user_id=this.activeUser.user_id;
             // this.online_users();
-               socket.emit('activeuser',  this.activeUser);
+               socket.emit('joined',  this.activeUser);
 
          console.warn("connteced",Object.keys(socket.connected).length,this.activeUser);
          window.onbeforeunload = () => {
@@ -2298,14 +2310,16 @@ el.scrollTop = el.innerHeight;
             });
 
      socket.on('leaved', (user) => {
-                    // this.users.splice(this.user.indexOf(user))
+
+         this.users.splice(this.users.findIndex(v => v.id === user.id), 1);
+
                     // this.info.push({ name: name, type: 'Leaved' })
                     setTimeout(() => {
                         // this.info = []
                     }, 5000);
                 })
 
-                socket.on('activeuser', (user) => {
+                socket.on('joined', (user) => {
 
 
                     // const arr_lngth=this.users.length+1
@@ -2339,6 +2353,9 @@ el.scrollTop = el.innerHeight;
 </script>
 
 
+
 <style>
+
+
 
 </style>

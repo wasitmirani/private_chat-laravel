@@ -4154,6 +4154,13 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    scrollToEnd: function scrollToEnd() {
+      window.scrollTo(0, document.querySelector(".chat-conversation").scrollHeight); // var container = document.querySelector(".chat-conversation");
+      // var scrollHeight = container.scrollHeight;
+      // container.scrollDown = scrollHeight /scrollHeight;
+      // console.log( scrollHeight);
+      // console.log(container.scrollToEnd)
+    },
     send_message: function send_message() {
       var _this = this;
 
@@ -4187,16 +4194,16 @@ __webpack_require__.r(__webpack_exports__);
       } // var id=document.getElementById('messagebox');
 
 
-      var el = document.getElementById('messagebox');
-      el.scrollTop = el.innerHeight; //            $('html, body').animate({
-      //     scrollTop: $("#messagebox").offset().top
+      $(".simplebar-content-wrapper").animate({
+        scrollTop: $('.simplebar-content-wrapper').prop("scrollHeight")
+      }, 1000); //            $('html, body').animate({
+      //     scrollTop: $("#messagebox").offseSt().top
       // }, 2000);
       // $(".simplebar-vertical").css("transform", "translate3d(200px, 200px, 200px)");
 
       axios.get('/api/private-messages/' + this.auth_user_id + '/' + activeFriend.user_id).then(function (response) {
         _this2.allMessages = response.data;
-        console.log();
-        setTimeout(_this2.scrollToEnd, 100);
+        console.log(); //   setTimeout(this.scrollToEnd,100);
       });
     },
     get_current_user: function get_current_user(user) {
@@ -4217,15 +4224,18 @@ __webpack_require__.r(__webpack_exports__);
       // console.log(active_users);
     }
   },
+  updated: function updated() {// this.scrollToEnd();
+  },
   mounted: function mounted() {
     var _this4 = this;
 
+    // this.scrollToEnd();
     // this.online_users();
     var retrievedObject = localStorage.getItem('Auth_user');
     this.activeUser = JSON.parse(retrievedObject);
     this.auth_user_id = this.activeUser.user_id; // this.online_users();
 
-    socket.emit('activeuser', this.activeUser);
+    socket.emit('joined', this.activeUser);
     console.warn("connteced", Object.keys(socket.connected).length, this.activeUser);
 
     window.onbeforeunload = function () {
@@ -4268,12 +4278,15 @@ __webpack_require__.r(__webpack_exports__);
       }
     });
     socket.on('leaved', function (user) {
-      // this.users.splice(this.user.indexOf(user))
-      // this.info.push({ name: name, type: 'Leaved' })
+      _this5.users.splice(_this5.users.findIndex(function (v) {
+        return v.id === user.id;
+      }), 1); // this.info.push({ name: name, type: 'Leaved' })
+
+
       setTimeout(function () {// this.info = []
       }, 5000);
     });
-    socket.on('activeuser', function (user) {
+    socket.on('joined', function (user) {
       // const arr_lngth=this.users.length+1
       for (var index = 0; index < _this5.users.length + 1; index++) {
         if (index == _this5.users.length + 1) {
@@ -32497,12 +32510,16 @@ var render = function() {
               "div",
               {
                 staticClass: "chat-conversation p-3 p-lg-4",
-                attrs: { "data-simplebar": "init", id: "messagebox" }
+                attrs: { "data-simplebar": "init" }
               },
               [
                 _c(
                   "ul",
-                  { staticClass: "list-unstyled mb-0" },
+                  {
+                    ref: "messagesContainer",
+                    staticClass: "list-unstyled mb-0",
+                    attrs: { id: "messagebox" }
+                  },
                   _vm._l(_vm.allMessages, function(message) {
                     return _c("div", { key: message.id }, [
                       _c(
@@ -51275,8 +51292,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\laragon\www\realtime_chat_laravel\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\laragon\www\realtime_chat_laravel\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\laragon\www\private_chat-laravel\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\private_chat-laravel\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ }),

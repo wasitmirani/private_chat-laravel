@@ -46,9 +46,10 @@ io.on('connection', (socket,user) => {
 
     socket.on('leaved', (name) => {
         socket.broadcast.emit('leaved', name)
+        console.log("leaved",name);
     })
-    socket.on('activeuser',(users)=>{
-        socket.broadcast.emit('activeuser', users)
+    socket.on('joined',(users)=>{
+        socket.broadcast.emit('joined', users)
 
 
         console.warn('active',users);
