@@ -1821,7 +1821,9 @@
                                 </div>
 
 
+<div class="chat-end">
 
+                        </div>
 
                                 <!-- <li class="right">
                                     <div class="conversation-list">
@@ -1861,7 +1863,7 @@
 
 
 
-                            </ul>
+                                                        </ul>
                         </div>
                         <!-- end chat conversation end -->
 
@@ -2170,7 +2172,9 @@
 
 	scrollToEnd() {
 
-        window.scrollTo(0,document.querySelector(".chat-conversation").scrollHeight);
+      $('.simplebar-content-wrapper').animate({
+         scrollTop: $(".chat-end").offset().top
+     },'slow');
 				// var container = document.querySelector(".chat-conversation");
 				// var scrollHeight = container.scrollHeight;
                 // container.scrollDown = scrollHeight /scrollHeight;
@@ -2193,6 +2197,7 @@
         sender_id: this.auth_user_id,
         receiver_id: this.activeFriend.user_id
       });
+    //   this.scrollToEnd();
      // setTimeout(window.scrollToEnd,100);
 
     setTimeout(() => {
@@ -2211,17 +2216,14 @@
                 if(!activeFriend){
                 return alert('Please select friend');
                 }
-                // var id=document.getElementById('messagebox');
-$(".simplebar-content-wrapper").animate({ scrollTop: $('.simplebar-content-wrapper').prop("scrollHeight")}, 1000);
-    //            $('html, body').animate({
-    //     scrollTop: $("#messagebox").offseSt().top
-    // }, 2000);
-                // $(".simplebar-vertical").css("transform", "translate3d(200px, 200px, 200px)");
+
+
+
+
 
             axios.get('/api/private-messages/'+this.auth_user_id+'/'+activeFriend.user_id).then(response => {
                 this.allMessages = response.data;
                 console.log()
-            //   setTimeout(this.scrollToEnd,100);
 
             });
         },
@@ -2230,6 +2232,7 @@ $(".simplebar-content-wrapper").animate({ scrollTop: $('.simplebar-content-wrapp
                 console.log(user);
 
                 this.fetchMessages(user);
+                    	this.scrollToEnd();
                 this.activeFriend=user;
             },
              online_users(){
@@ -2251,7 +2254,7 @@ $(".simplebar-content-wrapper").animate({ scrollTop: $('.simplebar-content-wrapp
 
 		},
         mounted() {
-            	// this.scrollToEnd();
+
 
             // this.online_users();
 
@@ -2305,6 +2308,7 @@ $(".simplebar-content-wrapper").animate({ scrollTop: $('.simplebar-content-wrapp
                         });
 
                         console.log(data.sender_id);
+                        // this.scrollToEnd();
                 }
 
             });

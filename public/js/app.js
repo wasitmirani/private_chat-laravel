@@ -4135,6 +4135,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['onlineusers'],
   data: function data() {
@@ -4155,7 +4157,9 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     scrollToEnd: function scrollToEnd() {
-      window.scrollTo(0, document.querySelector(".chat-conversation").scrollHeight); // var container = document.querySelector(".chat-conversation");
+      $('.simplebar-content-wrapper').animate({
+        scrollTop: $(".chat-end").offset().top
+      }, 'slow'); // var container = document.querySelector(".chat-conversation");
       // var scrollHeight = container.scrollHeight;
       // container.scrollDown = scrollHeight /scrollHeight;
       // console.log( scrollHeight);
@@ -4173,7 +4177,8 @@ __webpack_require__.r(__webpack_exports__);
         message: this.message_body,
         sender_id: this.auth_user_id,
         receiver_id: this.activeFriend.user_id
-      }); // setTimeout(window.scrollToEnd,100);
+      }); //   this.scrollToEnd();
+      // setTimeout(window.scrollToEnd,100);
 
       setTimeout(function () {
         $("#messagebox").css("bottom", "10");
@@ -4191,25 +4196,18 @@ __webpack_require__.r(__webpack_exports__);
 
       if (!activeFriend) {
         return alert('Please select friend');
-      } // var id=document.getElementById('messagebox');
-
-
-      $(".simplebar-content-wrapper").animate({
-        scrollTop: $('.simplebar-content-wrapper').prop("scrollHeight")
-      }, 1000); //            $('html, body').animate({
-      //     scrollTop: $("#messagebox").offseSt().top
-      // }, 2000);
-      // $(".simplebar-vertical").css("transform", "translate3d(200px, 200px, 200px)");
+      }
 
       axios.get('/api/private-messages/' + this.auth_user_id + '/' + activeFriend.user_id).then(function (response) {
         _this2.allMessages = response.data;
-        console.log(); //   setTimeout(this.scrollToEnd,100);
+        console.log();
       });
     },
     get_current_user: function get_current_user(user) {
       this.allMessages = [];
       console.log(user);
       this.fetchMessages(user);
+      this.scrollToEnd();
       this.activeFriend = user;
     },
     online_users: function online_users() {
@@ -4229,7 +4227,6 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this4 = this;
 
-    // this.scrollToEnd();
     // this.online_users();
     var retrievedObject = localStorage.getItem('Auth_user');
     this.activeUser = JSON.parse(retrievedObject);
@@ -4274,7 +4271,7 @@ __webpack_require__.r(__webpack_exports__);
           receiver_id: data.receiver_id
         });
 
-        console.log(data.sender_id);
+        console.log(data.sender_id); // this.scrollToEnd();
       }
     });
     socket.on('leaved', function (user) {
@@ -32520,108 +32517,120 @@ var render = function() {
                     staticClass: "list-unstyled mb-0",
                     attrs: { id: "messagebox" }
                   },
-                  _vm._l(_vm.allMessages, function(message) {
-                    return _c("div", { key: message.id }, [
-                      _c(
-                        "li",
-                        {
-                          class:
-                            _vm.auth_user_id == message.sender_id ? "" : "right"
-                        },
-                        [
-                          _c(
-                            "div",
-                            {
-                              staticClass: "conversation-list",
-                              attrs: { id: "" }
-                            },
-                            [
-                              _c("div", { staticClass: "chat-avatar" }, [
-                                _vm.auth_user_id === message.sender_id
-                                  ? _c(
-                                      "span",
-                                      [
-                                        _c("vue-letter-avatar", {
-                                          staticClass:
-                                            "rounded-circle avatar-xs",
-                                          attrs: {
-                                            name: _vm.activeUser.name,
-                                            size: "40",
-                                            rounded: true
-                                          }
-                                        })
-                                      ],
-                                      1
-                                    )
-                                  : _c(
-                                      "span",
-                                      [
-                                        _c("vue-letter-avatar", {
-                                          staticClass:
-                                            "rounded-circle avatar-xs",
-                                          attrs: {
-                                            name: _vm.activeFriend.name,
-                                            size: "40",
-                                            rounded: true
-                                          }
-                                        })
-                                      ],
-                                      1
-                                    ),
-                                _vm._v(" "),
-                                _c("span")
-                              ]),
-                              _vm._v(" "),
-                              _c("div", { staticClass: "user-chat-content" }, [
-                                _c("div", { staticClass: "ctext-wrap" }, [
-                                  _c(
-                                    "div",
-                                    { staticClass: "ctext-wrap-content" },
-                                    [
-                                      _c("p", { staticClass: "mb-0" }, [
-                                        _vm._v(
-                                          "\n                                                        " +
-                                            _vm._s(message.message) +
-                                            "\n                                                    "
-                                        )
-                                      ]),
-                                      _vm._v(" "),
-                                      _vm._m(10, true)
-                                    ]
-                                  ),
+                  [
+                    _vm._l(_vm.allMessages, function(message) {
+                      return _c("div", { key: message.id }, [
+                        _c(
+                          "li",
+                          {
+                            class:
+                              _vm.auth_user_id == message.sender_id
+                                ? ""
+                                : "right"
+                          },
+                          [
+                            _c(
+                              "div",
+                              {
+                                staticClass: "conversation-list",
+                                attrs: { id: "" }
+                              },
+                              [
+                                _c("div", { staticClass: "chat-avatar" }, [
+                                  _vm.auth_user_id === message.sender_id
+                                    ? _c(
+                                        "span",
+                                        [
+                                          _c("vue-letter-avatar", {
+                                            staticClass:
+                                              "rounded-circle avatar-xs",
+                                            attrs: {
+                                              name: _vm.activeUser.name,
+                                              size: "40",
+                                              rounded: true
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      )
+                                    : _c(
+                                        "span",
+                                        [
+                                          _c("vue-letter-avatar", {
+                                            staticClass:
+                                              "rounded-circle avatar-xs",
+                                            attrs: {
+                                              name: _vm.activeFriend.name,
+                                              size: "40",
+                                              rounded: true
+                                            }
+                                          })
+                                        ],
+                                        1
+                                      ),
                                   _vm._v(" "),
-                                  _vm._m(11, true)
+                                  _c("span")
                                 ]),
                                 _vm._v(" "),
                                 _c(
                                   "div",
-                                  { staticClass: "conversation-name" },
+                                  { staticClass: "user-chat-content" },
                                   [
-                                    _vm.auth_user_id == message.sender_id
-                                      ? _c("span", [
-                                          _vm._v(
-                                            "\n\n                                                    " +
-                                              _vm._s(_vm.activeUser.name) +
-                                              "\n                                                "
-                                          )
-                                        ])
-                                      : _c("span", [
-                                          _vm._v(
-                                            "\n                                                    " +
-                                              _vm._s(_vm.activeFriend.name) +
-                                              "\n                                                "
-                                          )
-                                        ])
+                                    _c("div", { staticClass: "ctext-wrap" }, [
+                                      _c(
+                                        "div",
+                                        { staticClass: "ctext-wrap-content" },
+                                        [
+                                          _c("p", { staticClass: "mb-0" }, [
+                                            _vm._v(
+                                              "\n                                                        " +
+                                                _vm._s(message.message) +
+                                                "\n                                                    "
+                                            )
+                                          ]),
+                                          _vm._v(" "),
+                                          _vm._m(10, true)
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _vm._m(11, true)
+                                    ]),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      { staticClass: "conversation-name" },
+                                      [
+                                        _vm.auth_user_id == message.sender_id
+                                          ? _c("span", [
+                                              _vm._v(
+                                                "\n\n                                                    " +
+                                                  _vm._s(_vm.activeUser.name) +
+                                                  "\n                                                "
+                                              )
+                                            ])
+                                          : _c("span", [
+                                              _vm._v(
+                                                "\n                                                    " +
+                                                  _vm._s(
+                                                    _vm.activeFriend.name
+                                                  ) +
+                                                  "\n                                                "
+                                              )
+                                            ])
+                                      ]
+                                    )
                                   ]
                                 )
-                              ])
-                            ]
-                          )
-                        ]
-                      )
-                    ])
-                  }),
-                  0
+                              ]
+                            )
+                          ]
+                        )
+                      ])
+                    }),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "chat-end" })
+                  ],
+                  2
                 )
               ]
             ),
